@@ -67,7 +67,7 @@ class CleanCommand(Command):
     user_options = [ ]
 
     def initialize_options(self):
-        self._clean_me = [pjoin('zmq', '_zmq.so') ]
+        self._clean_me = [pjoin('zmq', '_zmq.so'), pjoin('zmq', 'devices.so')]
         for root, dirs, files in os.walk('.'):
             for f in files:
                 if f.endswith('.pyc'):
@@ -93,8 +93,10 @@ try:
     from Cython.Distutils import build_ext
 except ImportError:
     zmq_source = os.path.join('zmq','_zmq.c')
+    device_source = os.path.join('zmq','devices.c')
 else:
     zmq_source = os.path.join('zmq','_zmq.pyx')
+    device_source = os.path.join('zmq','devices.pyx')
     cmdclass['build_ext'] =  build_ext
 
 if sys.platform == 'win32':
@@ -105,6 +107,11 @@ else:
 zmq = Extension(
     'zmq._zmq',
     sources = [zmq_source],
+    libraries = [libzmq]
+)
+devices = Extension(
+    'zmq.devices',
+    sources = [device_source],
     libraries = [libzmq]
 )
 
@@ -120,9 +127,10 @@ the ZeroMQ library (http://www.zeromq.org).
 
 setup(
     name = "pyzmq",
-    version = "2.0.8dev",
-    packages = ['zmq', 'zmq.tests', 'zmq.eventloop'],
-    ext_modules = [zmq],
+    version = "2.0.9dev",
+    packages = ['zmq', 'zmq.tests', 'zmq.eventloop', 'zmq.log'],
+    ext_modules = [zmq, devices],
+    package_data = dict(zmq=['*.pxd']),
     author = "Brian E. Granger",
     author_email = "ellisonbg@gmail.com",
     url = 'http://github.com/zeromq/pyzmq',

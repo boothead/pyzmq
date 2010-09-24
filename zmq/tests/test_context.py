@@ -25,8 +25,6 @@ import zmq
 from zmq.tests import BaseZMQTestCase
 
 
-from zmq.tests import BaseZMQTestCase
-
 #-----------------------------------------------------------------------------
 # Tests
 #-----------------------------------------------------------------------------
@@ -44,6 +42,11 @@ class TestContext(BaseZMQTestCase):
         c3 = zmq.Context()
         self.assert_(isinstance(c3, zmq.Context))
         del c3
+
+    def test_term(self):
+        c = zmq.Context()
+        c.term()
+        self.assert_(c.closed)
 
     def test_fail_init(self):
         self.assertRaisesErrno(zmq.EINVAL, zmq.Context, 0)
